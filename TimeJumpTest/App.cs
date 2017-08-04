@@ -7,7 +7,7 @@ namespace TimeJumpTest
 {
     public class App : Application
     {
-        TimeSpan period = TimeSpan.FromMilliseconds(1);
+        readonly TimeSpan period = TimeSpan.FromMilliseconds(1);
 
         public App()
         {
@@ -37,13 +37,14 @@ namespace TimeJumpTest
 
             MainPage.Appearing += async delegate {
 
+                var lastTime = DateTime.Now;
+
                 while (true) {
 
-                    var now = DateTime.Now;
                     await Task.Run(() => Thread.Sleep(period));
-                    var then = DateTime.Now;
+                    var currentTime = DateTime.Now;
 
-                    var elapsed = then - now;
+                    var elapsed = currentTime - lastTime;
                     if (elapsed < minTimeSpan) {
                         minTimeSpan = elapsed;
                         minLabel.Text = string.Format("Min: {0:0.000} ms", minTimeSpan.TotalMilliseconds);
@@ -57,6 +58,8 @@ namespace TimeJumpTest
                         Console.WriteLine("Short timespan: {0:0.000} ms elapsed", elapsed.TotalMilliseconds);
                     if (elapsed > TimeSpan.FromMilliseconds(10 * period.TotalMilliseconds))
                         Console.WriteLine("Long timespan: {0:0.000} ms elapsed", elapsed.TotalMilliseconds);
+
+                    lastTime = currentTime;
                 }
 
             };
