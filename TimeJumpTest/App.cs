@@ -103,8 +103,8 @@ namespace TimeJumpTest
         public void Log(string type, DateTime systemTime, DateTime mediaTime, TimeSpan elapsedSystem, TimeSpan elapsedMedia)
         {
             var message = $"{type}: ";
-            message += $"SYSTEM: {systemTime.TimeOfDay}, {elapsedSystem.TotalMilliseconds:0.000} ms ";
-            message += $"MEDIA: {mediaTime.TimeOfDay}, {elapsedMedia.TotalMilliseconds:0.000} ms";
+            message += $"SYSTEM:{elapsedSystem.TotalMilliseconds,8:F3} ms @ {systemTime.TimeOfDay}, ";
+            message += $"MEDIA:{elapsedMedia.TotalMilliseconds,8:F3} ms @ {mediaTime.TimeOfDay}";
 
             Console.WriteLine(message);
             file.WriteLine(message);
