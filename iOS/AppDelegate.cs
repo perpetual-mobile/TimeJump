@@ -12,6 +12,8 @@ namespace TimeJumpTest.iOS
     {
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
+            UIApplication.SharedApplication.IdleTimerDisabled = true;
+
             global::Xamarin.Forms.Forms.Init();
 
             LoadApplication(new App());
