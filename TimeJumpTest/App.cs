@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using CoreAnimation;
@@ -14,6 +15,9 @@ namespace TimeJumpTest
         TimeSpan maxSystemTimeSpan;
         TimeSpan minMediaTimeSpan;
         TimeSpan maxMediaTimeSpan;
+
+        static string filepath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "/Log.txt";
+        static readonly StreamWriter file = new StreamWriter(filepath, true) { AutoFlush = true };
 
         public App()
         {
@@ -98,9 +102,12 @@ namespace TimeJumpTest
 
         public void Log(string type, DateTime systemTime, DateTime mediaTime, TimeSpan elapsedSystem, TimeSpan elapsedMedia)
         {
-            Console.WriteLine($"{type}: " +
-                              $"SYSTEM: {systemTime.TimeOfDay}, {elapsedSystem.TotalMilliseconds:0.000} ms " +
-                              $"MEDIA: {mediaTime.TimeOfDay}, {elapsedMedia.TotalMilliseconds:0.000} ms");
+            var message = $"{type}: ";
+            message += $"SYSTEM: {systemTime.TimeOfDay}, {elapsedSystem.TotalMilliseconds:0.000} ms ";
+            message += $"MEDIA: {mediaTime.TimeOfDay}, {elapsedMedia.TotalMilliseconds:0.000} ms";
+
+            Console.WriteLine(message);
+            file.WriteLine(message);
         }
     }
 }
