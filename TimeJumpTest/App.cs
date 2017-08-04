@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using CoreAnimation;
 using Xamarin.Forms;
 
 namespace TimeJumpTest
@@ -9,60 +10,97 @@ namespace TimeJumpTest
     {
         readonly TimeSpan period = TimeSpan.FromMilliseconds(1);
 
+        TimeSpan minSystemTimeSpan;
+        TimeSpan maxSystemTimeSpan;
+        TimeSpan minMediaTimeSpan;
+        TimeSpan maxMediaTimeSpan;
+
         public App()
         {
-            var minLabel = new Label();
-            var maxLabel = new Label();
+            var minSystemLabel = new Label();
+            var maxSystemLabel = new Label();
+            var minMediaLabel = new Label();
+            var maxMediaLabel = new Label();
 
-            var minTimeSpan = TimeSpan.MaxValue;
-            var maxTimeSpan = TimeSpan.MinValue;
+            var resetButton = new Button {
+                Text = "Reset",
+                Command = new Command(obj => Reset()),
+            };
+            Reset();
 
             MainPage = new ContentPage {
                 Padding = 20,
                 Content = new StackLayout {
                     VerticalOptions = LayoutOptions.Center,
                     Children = {
-                        minLabel,
-                        maxLabel,
-                        new Button {
-                            Text = "Reset",
-                            Command = new Command(obj => {
-                                minTimeSpan = TimeSpan.MaxValue;
-                                maxTimeSpan = TimeSpan.MinValue;
-                            }),
-                        },
+                        minSystemLabel,
+                        maxSystemLabel,
+                        minMediaLabel,
+                        maxMediaLabel,
+                        resetButton,
                     },
                 },
             };
 
             MainPage.Appearing += async delegate {
 
-                var lastTime = DateTime.Now;
+                var lastSystemTime = DateTime.Now;
+                var lastMediaTime = new DateTime((long)(CAAnimation.CurrentMediaTime() * 1e7));
 
                 while (true) {
 
                     await Task.Run(() => Thread.Sleep(period));
-                    var currentTime = DateTime.Now;
+                    var currentSystemTime = DateTime.Now;
+                    var currentMediaTime = new DateTime((long)(CAAnimation.CurrentMediaTime() * 1e7));
 
-                    var elapsed = currentTime - lastTime;
-                    if (elapsed < minTimeSpan) {
-                        minTimeSpan = elapsed;
-                        minLabel.Text = string.Format("Min: {0:0.000} ms", minTimeSpan.TotalMilliseconds);
+                    var elapsedSystem = currentSystemTime - lastSystemTime;
+                    var elapsedMedia = currentMediaTime - lastMediaTime;
+
+                    if (elapsedSystem < minSystemTimeSpan) {
+                        minSystemTimeSpan = elapsedSystem;
+                        minSystemLabel.Text = string.Format("Min system: {0:0.000} ms", minSystemTimeSpan.TotalMilliseconds);
                     }
-                    if (elapsed > maxTimeSpan) {
-                        maxTimeSpan = elapsed;
-                        maxLabel.Text = string.Format("Max: {0:0.000} ms", maxTimeSpan.TotalMilliseconds);
+                    if (elapsedSystem > maxSystemTimeSpan) {
+                        maxSystemTimeSpan = elapsedSystem;
+                        maxSystemLabel.Text = string.Format("Max system: {0:0.000} ms", maxSystemTimeSpan.TotalMilliseconds);
                     }
 
-                    if (elapsed < period)
-                        Console.WriteLine("Short timespan: {0:0.000} ms elapsed", elapsed.TotalMilliseconds);
-                    if (elapsed > TimeSpan.FromMilliseconds(10 * period.TotalMilliseconds))
-                        Console.WriteLine("Long timespan: {0:0.000} ms elapsed", elapsed.TotalMilliseconds);
+                    if (elapsedMedia < minMediaTimeSpan) {
+                        minMediaTimeSpan = elapsedMedia;
+                        minMediaLabel.Text = string.Format("Min media: {0:0.000} ms", minMediaTimeSpan.TotalMilliseconds);
+                    }
+                    if (elapsedMedia > maxMediaTimeSpan) {
+                        maxMediaTimeSpan = elapsedMedia;
+                        maxMediaLabel.Text = string.Format("Max media: {0:0.000} ms", maxMediaTimeSpan.TotalMilliseconds);
+                    }
 
-                    lastTime = currentTime;
+                    if (elapsedSystem < period || elapsedMedia < period)
+                        Log("Short", currentSystemTime, currentMediaTime, elapsedSystem, elapsedMedia);
+                    if (elapsedSystem > TimeSpan.FromMilliseconds(10 * period.TotalMilliseconds) ||
+                        elapsedMedia > TimeSpan.FromMilliseconds(10 * period.TotalMilliseconds))
+                        Log("Long ", currentSystemTime, currentMediaTime, elapsedSystem, elapsedMedia);
+
+                    lastSystemTime = currentSystemTime;
+                    lastMediaTime = currentMediaTime;
+
                 }
 
             };
+        }
+
+        public void Reset()
+        {
+            minSystemTimeSpan = TimeSpan.MaxValue;
+            maxSystemTimeSpan = TimeSpan.MinValue;
+            minMediaTimeSpan = TimeSpan.MaxValue;
+            maxMediaTimeSpan = TimeSpan.MinValue;
+        }
+
+        public void Log(string type, DateTime systemTime, DateTime mediaTime, TimeSpan elapsedSystem, TimeSpan elapsedMedia)
+        {
+            Console.WriteLine($"{type}: " +
+                              $"SYSTEM: {systemTime.TimeOfDay}, {elapsedSystem.TotalMilliseconds:0.000} ms " +
+                              $"MEDIA: {mediaTime.TimeOfDay}, {elapsedMedia.TotalMilliseconds:0.000} ms");
         }
     }
 }
