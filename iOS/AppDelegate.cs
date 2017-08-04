@@ -1,24 +1,41 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
 using Foundation;
 using UIKit;
+using Xamarin.Forms;
+using Xamarin.Forms.Platform.iOS;
 
 namespace TimeJumpTest.iOS
 {
     [Register("AppDelegate")]
-    public partial class AppDelegate : global::Xamarin.Forms.Platform.iOS.FormsApplicationDelegate
+    public class AppDelegate : FormsApplicationDelegate
     {
-        public override bool FinishedLaunching(UIApplication app, NSDictionary options)
+        nint taskId;
+
+        public override bool FinishedLaunching(UIApplication uiApplication, NSDictionary launchOptions)
         {
             UIApplication.SharedApplication.IdleTimerDisabled = true;
 
-            global::Xamarin.Forms.Forms.Init();
+            Forms.Init();
 
             LoadApplication(new App());
 
-            return base.FinishedLaunching(app, options);
+            return base.FinishedLaunching(uiApplication, launchOptions);
+        }
+
+        public override void DidEnterBackground(UIApplication uiApplication)
+        {
+            base.DidEnterBackground(uiApplication);
+
+            taskId = UIApplication.SharedApplication.BeginBackgroundTask(() => {
+                UIApplication.SharedApplication.EndBackgroundTask(taskId);
+            });
+        }
+
+        public override void WillEnterForeground(UIApplication uiApplication)
+        {
+            UIApplication.SharedApplication.EndBackgroundTask(taskId);
+
+            base.WillEnterForeground(uiApplication);
         }
     }
 }
