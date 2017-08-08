@@ -157,7 +157,7 @@ namespace TimeJumpTest
             var message = $"{type}: ";
             message += $"SYSTEM:{elapsedSystem.TotalMilliseconds,8:F3} ms @ {systemTime.TimeOfDay}, ";
             message += $"MEDIA:{elapsedMedia.TotalMilliseconds,8:F3} ms @ {mediaTime.TimeOfDay}, ";
-            message += $"DELTA: {deltaTime.TotalMilliseconds} ms";
+            message += $"DELTA: {delta.TotalMilliseconds} ms";
 
             Console.WriteLine(message);
             file.WriteLine(message);
