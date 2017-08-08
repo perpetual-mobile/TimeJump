@@ -126,8 +126,8 @@ namespace TimeJumpTest
 
                     if (elapsedSystem < period || elapsedMedia < period || elapsedStopwatch < period.Ticks)
                         Log("Short", currentSystemTime, currentMediaTime, elapsedSystem, elapsedMedia, deltaTime);
-                    if (elapsedSystem > TimeSpan.FromMilliseconds(10 * period.TotalMilliseconds) ||
-                        elapsedMedia > TimeSpan.FromMilliseconds(10 * period.TotalMilliseconds))
+                    if (elapsedSystem > TimeSpan.FromMilliseconds(3 * period.TotalMilliseconds + 13) ||
+                        elapsedMedia > TimeSpan.FromMilliseconds(3 * period.TotalMilliseconds + 13))
                         Log("Long ", currentSystemTime, currentMediaTime, elapsedSystem, elapsedMedia, deltaTime);
 
                     lastSystemTime = currentSystemTime;
