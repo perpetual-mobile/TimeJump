@@ -147,7 +147,7 @@ namespace TimeJumpTest
             maxMediaTimeSpan = TimeSpan.MinValue;
             minStopwatchSpan = long.MaxValue;
             maxStopwatchSpan = long.MinValue;
-
+            Log("Reset", DateTime.Now, new DateTime((long)(CAAnimation.CurrentMediaTime() * 1e7)), TimeSpan.Zero, TimeSpan.Zero, TimeSpan.Zero);
 			startSystemTime = DateTime.Now;
 			startMediaTime = new DateTime((long)(CAAnimation.CurrentMediaTime() * 1e7));
         }
